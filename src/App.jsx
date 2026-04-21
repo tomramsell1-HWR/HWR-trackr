@@ -23,7 +23,7 @@ const nowISO = () => new Date().toISOString();
 const toLocal = (iso) => {
   const d = new Date(iso);
   const pad = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return ${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())};
 };
 const fromLocal = (val) => (val ? new Date(val).toISOString() : nowISO());
 
@@ -31,7 +31,7 @@ const fromLocal = (val) => (val ? new Date(val).toISOString() : nowISO());
 const Pill = ({ label, active, color, onClick }) => (
   <button onClick={onClick} style={{
     padding: "6px 14px", borderRadius: 20,
-    border: `2px solid ${active ? color : T.border}`,
+    border: 2px solid ${active ? color : T.border},
     background: active ? color : "#fff",
     color: active ? "#fff" : T.muted,
     fontWeight: 700, fontSize: 13, cursor: "pointer",
@@ -52,7 +52,7 @@ const Field = ({ label, children }) => (
 
 const iBase = {
   width: "100%", padding: "10px 12px", borderRadius: 10,
-  border: `1.5px solid ${T.border}`, fontSize: 14, background: "#fff",
+  border: 1.5px solid ${T.border}, fontSize: 14, background: "#fff",
   color: T.text, outline: "none", fontFamily: "inherit", boxSizing: "border-box",
 };
 const Inp = (props) => <input style={iBase} {...props} />;
@@ -64,9 +64,9 @@ const AddBtn = ({ color, onClick, label = "Add Entry", disabled }) => (
     width: "100%", padding: 13, borderRadius: 12, border: "none",
     background: disabled ? "#ccc" : color, color: "#fff",
     fontWeight: 800, fontSize: 15, cursor: disabled ? "not-allowed" : "pointer",
-    boxShadow: disabled ? "none" : `0 4px 16px ${color}44`,
+    boxShadow: disabled ? "none" : 0 4px 16px ${color}44,
     fontFamily: "inherit", marginTop: 4, transition: "all .2s",
-  }}>{disabled ? "Savingâ€¦" : `${label} âœ“`}</button>
+  }}>{disabled ? "Savingâ€¦" : ${label} âœ“}</button>
 );
 
 const Section = ({ title, emoji, color, children, count }) => {
@@ -96,7 +96,7 @@ const EntryCard = ({ entry, color, summary, onDelete }) => (
   <div style={{
     background: color.light, borderRadius: 12, padding: "10px 14px", marginBottom: 8,
     display: "flex", justifyContent: "space-between", alignItems: "flex-start",
-    border: `1px solid ${color.base}22`, animation: "fadeUp .25s ease",
+    border: 1px solid ${color.base}22, animation: "fadeUp .25s ease",
   }}>
     <div style={{ flex: 1 }}>
       <div style={{ fontSize: 12, color: T.muted, marginBottom: 2 }}>
@@ -162,7 +162,7 @@ function FeedSection({ entries, onAdd, onDelete }) {
         <div style={{ marginTop: 16 }}>
           {entries.slice(0, 10).map((e) => (
             <EntryCard key={e.id} entry={e} color={T.feed} onDelete={onDelete}
-              summary={[e.what, e.size && `(${e.size})`, e.duration_mins && `${e.duration_mins} min`].filter(Boolean).join(" Â· ")} />
+              summary={[e.what, e.size && (${e.size}), e.duration_mins && ${e.duration_mins} min].filter(Boolean).join(" Â· ")} />
           ))}
         </div>
       )}
@@ -217,8 +217,8 @@ function NappySection({ entries, onAdd, onDelete }) {
   return (
     <Section title="Nappies" emoji="ðŸ’©" color={T.poo} count={entries.length}>
       <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-        {tabBtn("poo", `ðŸ’© Poos (${poos.length})`)}
-        {tabBtn("wee", `ðŸ’§ Wees (${wees.length})`)}
+        {tabBtn("poo", ðŸ’© Poos (${poos.length}))}
+        {tabBtn("wee", ðŸ’§ Wees (${wees.length}))}
       </div>
 
       {tab === "poo" && <>
@@ -254,7 +254,7 @@ function NappySection({ entries, onAdd, onDelete }) {
             <Label>Recent poos</Label>
             {poos.slice(0, 8).map((e) => (
               <EntryCard key={e.id} entry={e} color={T.poo} onDelete={onDelete}
-                summary={[e.colour, e.consistency, e.size && `(${e.size})`].filter(Boolean).join(" Â· ") || "Poo logged"} />
+                summary={[e.colour, e.consistency, e.size && (${e.size})].filter(Boolean).join(" Â· ") || "Poo logged"} />
             ))}
           </div>
         )}
@@ -278,7 +278,7 @@ function NappySection({ entries, onAdd, onDelete }) {
             <Label>Recent wees ({wees.length} total)</Label>
             {wees.slice(0, 10).map((e) => (
               <EntryCard key={e.id} entry={e} color={{ base: "#6B9EC4", light: "#EEF6FF", dark: "#4A7FA8" }} onDelete={onDelete}
-                summary={`Wee logged${e.notes ? ` Â· ${e.notes}` : ""}`} />
+                summary={Wee logged${e.notes ? ` Â· ${e.notes} : ""}`} />
             ))}
           </div>
         )}
@@ -330,7 +330,7 @@ function MoodSection({ entries, onAdd, onDelete }) {
         <div style={{ marginTop: 16 }}>
           {entries.slice(0, 10).map((e) => (
             <EntryCard key={e.id} entry={e} color={T.mood} onDelete={onDelete}
-              summary={`${e.period}: ${e.mood}`} />
+              summary={${e.period}: ${e.mood}} />
           ))}
         </div>
       )}
@@ -387,7 +387,7 @@ function ActivitySection({ entries, onAdd, onDelete }) {
         <div style={{ marginTop: 16 }}>
           {entries.slice(0, 10).map((e) => (
             <EntryCard key={e.id} entry={e} color={T.activity} onDelete={onDelete}
-              summary={[e.activity, e.duration_mins && `${e.duration_mins} min`].filter(Boolean).join(" Â· ")} />
+              summary={[e.activity, e.duration_mins && ${e.duration_mins} min].filter(Boolean).join(" Â· ")} />
           ))}
         </div>
       )}
@@ -418,30 +418,31 @@ function SleepSection({ entries, onAdd, onDelete }) {
     await onAdd({
       id: uid(), type: "sleep",
       timestamp: fromLocal(sleepStart),
-sleep_start: fromLocal(sleepStart),
-        sleep_end: fromLocal(sleepEnd),
-        duration_mins: Math.round(dur),
-        quality, notes,
+      sleep_start: fromLocal(sleepStart),
+      sleep_end
+      sleep_end: fromLocal(sleepEnd),
+      duration_mins: Math.round(dur),
+      quality, notes,
     });
     setQuality(""); setNotes("");
     const n = toLocal(nowISO()); setSleepStart(n); setSleepEnd(n);
     setSaving(false);
   };
- 
+
   const dur = calcDur();
   const durLabel = dur && dur > 0
-    ? `${Math.floor(dur / 60) > 0 ? Math.floor(dur / 60) + "h " : ""}${Math.round(dur % 60)}m`
+    ? ${Math.floor(dur / 60) > 0 ? Math.floor(dur / 60) + "h " : ""}${Math.round(dur % 60)}m
     : null;
- 
+
   const summarise = (e) => {
     const h = Math.floor(e.duration_mins / 60), m = e.duration_mins % 60;
     const s = e.sleep_start || e.timestamp;
     const en = e.sleep_end || e.timestamp;
-    return `${fmtTime(s)} → ${fmtTime(en)} · ${h > 0 ? h + "h " : ""}${m}m${e.quality ? ` · ${e.quality}` : ""}`;
+    return ${fmtTime(s)} â†’ ${fmtTime(en)} Â· ${h > 0 ? h + "h " : ""}${m}m${e.quality ? ` Â· ${e.quality} : ""}`;
   };
- 
+
   return (
-    <Section title="Sleep" emoji="🌙" color={T.sleep} count={entries.length}>
+    <Section title="Sleep" emoji="ðŸŒ™" color={T.sleep} count={entries.length}>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <Field label="Fell asleep">
           <Inp type="datetime-local" value={sleepStart} onChange={(e) => setSleepStart(e.target.value)} />
@@ -452,7 +453,7 @@ sleep_start: fromLocal(sleepStart),
       </div>
       {durLabel && (
         <div style={{ background: T.sleep.light, borderRadius: 10, padding: "8px 14px", marginBottom: 12, fontSize: 13, fontWeight: 700, color: T.sleep.dark }}>
-          ⏱ Duration: {durLabel}
+          â± Duration: {durLabel}
         </div>
       )}
       <Field label="Sleep quality">
@@ -461,7 +462,7 @@ sleep_start: fromLocal(sleepStart),
         </div>
       </Field>
       <Field label="Notes">
-        <Txt placeholder="e.g. 'woke twice', 'settled easily with dummy'…" value={notes} onChange={(e) => setNotes(e.target.value)} />
+        <Txt placeholder="e.g. 'woke twice', 'settled easily with dummy'â€¦" value={notes} onChange={(e) => setNotes(e.target.value)} />
       </Field>
       <AddBtn color={T.sleep.base} onClick={add} disabled={saving} />
       {entries.length > 0 && (
@@ -474,8 +475,8 @@ sleep_start: fromLocal(sleepStart),
     </Section>
   );
 }
- 
-// ─── STATS BAR ────────────────────────────────────────────────────────────────
+
+// â”€â”€â”€ STATS BAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function StatsBar({ entries }) {
   const today = new Date().toDateString();
   const td = entries.filter((e) => new Date(e.timestamp).toDateString() === today);
@@ -485,17 +486,17 @@ function StatsBar({ entries }) {
   const sleeps = td.filter((e) => e.type === "sleep");
   const totalMins = sleeps.reduce((s, e) => s + (e.duration_mins || 0), 0);
   const sleepStr = totalMins > 0
-    ? `${Math.floor(totalMins / 60) > 0 ? Math.floor(totalMins / 60) + "h" : ""}${totalMins % 60 > 0 ? (totalMins % 60) + "m" : ""}`
-    : "—";
- 
+    ? ${Math.floor(totalMins / 60) > 0 ? Math.floor(totalMins / 60) + "h" : ""}${totalMins % 60 > 0 ? (totalMins % 60) + "m" : ""}
+    : "â€”";
+
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6, marginBottom: 18 }}>
       {[
-        { emoji: "🍼", val: feeds.length, label: "Feeds", color: T.feed.base },
-        { emoji: "💩", val: poos.length, label: "Poos", color: T.poo.base },
-        { emoji: "💧", val: wees.length, label: "Wees", color: "#6B9EC4" },
-        { emoji: "🌙", val: sleepStr, label: "Sleep", color: T.sleep.base },
-        { emoji: "📝", val: entries.length, label: "All logs", color: T.activity.base },
+        { emoji: "ðŸ¼", val: feeds.length, label: "Feeds", color: T.feed.base },
+        { emoji: "ðŸ’©", val: poos.length, label: "Poos", color: T.poo.base },
+        { emoji: "ðŸ’§", val: wees.length, label: "Wees", color: "#6B9EC4" },
+        { emoji: "ðŸŒ™", val: sleepStr, label: "Sleep", color: T.sleep.base },
+        { emoji: "ðŸ“", val: entries.length, label: "All logs", color: T.activity.base },
       ].map((s) => (
         <div key={s.label} style={{ background: "#fff", borderRadius: 14, padding: "12px 6px", textAlign: "center", boxShadow: "0 2px 10px #0000000a" }}>
           <div style={{ fontSize: 18 }}>{s.emoji}</div>
@@ -506,28 +507,28 @@ function StatsBar({ entries }) {
     </div>
   );
 }
- 
-// ─── AI INSIGHTS ──────────────────────────────────────────────────────────────
+
+// â”€â”€â”€ AI INSIGHTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function AIInsights({ entries }) {
   const [insight, setInsight] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
- 
+
   const analyse = async () => {
     if (entries.length < 3) { setError("Log at least 3 entries first for meaningful insights!"); return; }
     setError(""); setLoading(true); setInsight("");
- 
+
     const lines = entries.map((e) => {
-      if (e.type === "feed")     return `[Feed | ${fmtDate(e.timestamp)} ${fmtTime(e.timestamp)}] ${e.what}${e.size ? ` (${e.size})` : ""}${e.duration_mins ? `, ${e.duration_mins} mins` : ""}${e.notes ? ` — "${e.notes}"` : ""}`;
-      if (e.type === "poo")      return `[Nappy/Poo | ${fmtDate(e.timestamp)} ${fmtTime(e.timestamp)}] ${[e.colour, e.consistency, e.size].filter(Boolean).join(", ")}${e.notes ? ` — "${e.notes}"` : ""}`;
-      if (e.type === "wee")      return `[Nappy/Wee | ${fmtDate(e.timestamp)} ${fmtTime(e.timestamp)}]${e.notes ? ` — "${e.notes}"` : ""}`;
-      if (e.type === "mood")     return `[Mood | ${fmtDate(e.timestamp)}] ${e.period}: ${e.mood}${e.notes ? ` — "${e.notes}"` : ""}`;
-      if (e.type === "activity") return `[Activity | ${fmtDate(e.timestamp)} ${fmtTime(e.timestamp)}] ${e.activity}${e.duration_mins ? ` (${e.duration_mins} mins)` : ""}${e.notes ? ` — "${e.notes}"` : ""}`;
-      if (e.type === "sleep")    return `[Sleep | ${fmtDate(e.sleep_start || e.timestamp)}] ${fmtTime(e.sleep_start || e.timestamp)}–${fmtTime(e.sleep_end || e.timestamp)}, ${e.duration_mins} mins, quality: ${e.quality || "unrecorded"}${e.notes ? ` — "${e.notes}"` : ""}`;
+      if (e.type === "feed")     return [Feed | ${fmtDate(e.timestamp)} ${fmtTime(e.timestamp)}] ${e.what}${e.size ? ` (${e.size}) : ""}${e.duration_mins ? , ${e.duration_mins} mins : ""}${e.notes ? ` â€” "${e.notes}"` : ""}`;
+      if (e.type === "poo")      return [Nappy/Poo | ${fmtDate(e.timestamp)} ${fmtTime(e.timestamp)}] ${[e.colour, e.consistency, e.size].filter(Boolean).join(", ")}${e.notes ? ` â€” "${e.notes}" : ""}`;
+      if (e.type === "wee")      return [Nappy/Wee | ${fmtDate(e.timestamp)} ${fmtTime(e.timestamp)}]${e.notes ? ` â€” "${e.notes}" : ""}`;
+      if (e.type === "mood")     return [Mood | ${fmtDate(e.timestamp)}] ${e.period}: ${e.mood}${e.notes ? ` â€” "${e.notes}" : ""}`;
+      if (e.type === "activity") return [Activity | ${fmtDate(e.timestamp)} ${fmtTime(e.timestamp)}] ${e.activity}${e.duration_mins ? ` (${e.duration_mins} mins) : ""}${e.notes ? ` â€” "${e.notes}"` : ""}`;
+      if (e.type === "sleep")    return [Sleep | ${fmtDate(e.sleep_start || e.timestamp)}] ${fmtTime(e.sleep_start || e.timestamp)}â€“${fmtTime(e.sleep_end || e.timestamp)}, ${e.duration_mins} mins, quality: ${e.quality || "unrecorded"}${e.notes ? ` â€” "${e.notes}" : ""}`;
       return "";
     }).join("\n");
- 
+
     try {
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
@@ -536,17 +537,17 @@ function AIInsights({ entries }) {
           model: "claude-sonnet-4-20250514",
           max_tokens: 1200,
           system: `You are a warm, expert baby care assistant helping new parents understand their baby's patterns. You receive structured logs of feeds, nappies, moods, activities, and sleep.
- 
+
 Give insights under these bold headings:
-**Feeding Patterns** — preferences, portion observations, timing
-**Sleep Patterns** — duration trends, quality, what helps or hinders
-**Mood & Wellbeing** — when she's happiest, links to feeding and sleep
-**Nappy Health** — any notable patterns, reassure where appropriate
-**Activities** — what she engages well with
-**Top Tips** — 2–3 practical, actionable suggestions
- 
+*Feeding Patterns* â€” preferences, portion observations, timing
+*Sleep Patterns* â€” duration trends, quality, what helps or hinders
+*Mood & Wellbeing* â€” when she's happiest, links to feeding and sleep
+*Nappy Health* â€” any notable patterns, reassure where appropriate
+*Activities* â€” what she engages well with
+*Top Tips* â€” 2â€“3 practical, actionable suggestions
+
 Be warm, specific, and concise. Tired new parents are reading this on their phones.`,
-          messages: [{ role: "user", content: `Baby's logs:\n\n${lines}\n\nWhat patterns do you see?` }],
+          messages: [{ role: "user", content: Baby's logs:\n\n${lines}\n\nWhat patterns do you see? }],
         }),
       });
       const data = await res.json();
@@ -556,74 +557,75 @@ Be warm, specific, and concise. Tired new parents are reading this on their phon
     }
     setLoading(false);
   };
- 
+
   const renderMd = (text) =>
     text.split("\n").map((line, i) => {
-      if (/^\*\*(.+)\*\*$/.test(line)) return <div key={i} style={{ fontWeight: 800, color: T.ai.dark, marginTop: 14, marginBottom: 4, fontSize: 14 }}>{line.replace(/\*\*/g, "")}</div>;
-      if (line.startsWith("- ") || line.startsWith("• ")) return <div key={i} style={{ fontSize: 14, color: T.text, paddingLeft: 14, marginBottom: 4, lineHeight: 1.6 }}>• {line.slice(2)}</div>;
+      if (/^\\(.+)\\$/.test(line)) return <div key={i} style={{ fontWeight: 800, color: T.ai.dark, marginTop: 14, marginBottom: 4, fontSize: 14 }}>{line.replace(/\\/g, "")}</div>;
+      if (line.startsWith("- ") || line.startsWith("â€¢ ")) return <div key={i} style={{ fontSize: 14, color: T.text, paddingLeft: 14, marginBottom: 4, lineHeight: 1.6 }}>â€¢ {line.slice(2)}</div>;
       return line ? <div key={i} style={{ fontSize: 14, color: T.text, marginBottom: 4, lineHeight: 1.65 }}>{line}</div> : <div key={i} style={{ height: 6 }} />;
     });
- 
+
   return (
-    <div style={{ marginBottom: 14, borderRadius: 18, overflow: "hidden", boxShadow: "0 2px 16px #00000009", border: `2px solid ${T.ai.base}33` }}>
+    <div style={{ marginBottom: 14, borderRadius: 18, overflow: "hidden", boxShadow: "0 2px 16px #00000009", border: 2px solid ${T.ai.base}33 }}>
       <div onClick={() => setOpen((o) => !o)} style={{
         background: T.ai.light, padding: "16px 18px",
         display: "flex", alignItems: "center", justifyContent: "space-between",
         cursor: "pointer", userSelect: "none",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 24 }}>✨</span>
+          <span style={{ fontSize: 24 }}>âœ¨</span>
           <div>
             <div style={{ fontWeight: 800, fontSize: 16, color: T.ai.dark }}>AI Pattern Insights</div>
             <div style={{ fontSize: 12, color: T.muted }}>Spot patterns across all your logs</div>
           </div>
         </div>
-        <span style={{ color: T.ai.base, fontSize: 22, fontWeight: 700, lineHeight: 1 }}>{open ? "−" : "+"}</span>
+        <span style={{ color: T.ai.base, fontSize: 22, fontWeight: 700, lineHeight: 1 }}>{open ? "âˆ’" : "+"}</span>
       </div>
       {open && (
         <div style={{ background: "#fff", padding: 18 }}>
           {error && <div style={{ color: T.feed.base, fontSize: 13, marginBottom: 10, fontWeight: 600 }}>{error}</div>}
           {insight && (
-            <div style={{ background: T.ai.light, borderRadius: 14, padding: "14px 16px", marginBottom: 14, border: `1px solid ${T.ai.base}22` }}>
+            <div style={{ background: T.ai.light, borderRadius: 14, padding: "14px 16px", marginBottom: 14, border: 1px solid ${T.ai.base}22 }}>
               {renderMd(insight)}
             </div>
           )}
           <button onClick={analyse} disabled={loading} style={{
             width: "100%", padding: 13, borderRadius: 12, border: "none",
-            background: loading ? "#ccc" : `linear-gradient(135deg, ${T.ai.base}, #7C3AED)`,
+            background: loading ? "#ccc" : linear-gradient(135deg, ${T.ai.base}, #7C3AED),
             color: "#fff", fontWeight: 800, fontSize: 15,
             cursor: loading ? "not-allowed" : "pointer",
-            boxShadow: loading ? "none" : `0 4px 16px ${T.ai.base}44`,
+            boxShadow: loading ? "none" : 0 4px 16px ${T.ai.base}44,
             fontFamily: "inherit",
           }}>
-            {loading ? "Analysing all logs… 🔍" : "Analyse Patterns ✨"}
+            {loading ? "Analysing all logsâ€¦ ðŸ”" : "Analyse Patterns âœ¨"}
           </button>
         </div>
       )}
     </div>
   );
 }
- 
-// ─── SYNC STATUS ──────────────────────────────────────────────────────────────
+
+// â”€â”€â”€ SYNC STATUS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function SyncBadge({ status }) {
   const cfg = {
-    connected: { color: "#4A9E8B", label: "● Synced" },
-    syncing:   { color: "#E8A838", label: "↻ Syncing…" },
-    error:     { color: "#E8734A", label: "⚠ Offline" },
-  }[status] || { color: T.muted, label: "Connecting…" };
- 
+    connected: { color: "#4A9E8B", label: "â— Synced" },
+    syncing:   { color: "#E8A838", label: "â†» Syncingâ€¦" },
+    error:     { color: "#E8734A", label: "âš  Offline" },
+  }[status] || { color: T.muted, label: "Connectingâ€¦" };
+
   return (
     <span style={{ fontSize: 11, fontWeight: 700, color: cfg.color, background: cfg.color + "18", borderRadius: 20, padding: "3px 10px" }}>
       {cfg.label}
     </span>
   );
 }
- 
-// ─── ROOT APP ─────────────────────────────────────────────────────────────────
+
+// â”€â”€â”€ ROOT APP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function App() {
   const [entries, setEntries] = useState([]);
   const [syncStatus, setSyncStatus] = useState("connecting");
- 
+
+  // Load all entries on mount
   const loadEntries = useCallback(async () => {
     setSyncStatus("syncing");
     const { data, error } = await supabase
@@ -631,7 +633,7 @@ export default function App() {
       .select("*")
       .order("timestamp", { ascending: false })
       .limit(500);
- 
+
     if (error) {
       console.error("Load error:", error);
       setSyncStatus("error");
@@ -640,20 +642,94 @@ export default function App() {
       setSyncStatus("connected");
     }
   }, []);
- 
+
   useEffect(() => {
     loadEntries();
- 
+
+    // Real-time subscription â€” any change on any device updates both screens
     const channel = supabase
       .channel("entries-changes")
       .on("postgres_changes", { event: "*", schema: "public", table: "entries" }, () => {
         loadEntries();
       })
       .subscribe();
- 
+
     return () => supabase.removeChannel(channel);
   }, [loadEntries]);
- 
+
   const addEntry = async (entry) => {
     setSyncStatus("syncing");
-    const { error } = await supabase.f
+    const { error } = await supabase.from("entries").insert([entry]);
+    if (error) {
+      console.error("Insert error:", error);
+      setSyncStatus("error");
+    } else {
+      setSyncStatus("connected");
+    }
+  };
+
+  const delEntry = async (id) => {
+    setSyncStatus("syncing");
+    const { error } = await supabase.from("entries").delete().eq("id", id);
+    if (error) {
+      console.error("Delete error:", error);
+      setSyncStatus("error");
+    } else {
+      setSyncStatus("connected");
+    }
+  };
+
+  const byType = (t) => entries.filter((e) => e.type === t);
+
+  return (
+    <div style={{ minHeight: "100vh", background: T.bg, fontFamily: "'Nunito', 'Trebuchet MS', sans-serif" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        select, input, textarea { font-family: inherit; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        input[type="datetime-local"], input[type="date"] { color-scheme: light; }
+        body { padding-top: env(safe-area-inset-top); }
+      `}</style>
+
+      {/* Header */}
+      <div style={{
+        background: "linear-gradient(150deg, #2A2118 0%, #4A3728 100%)",
+        padding: "30px 20px 22px", textAlign: "center", color: "#fff", marginBottom: 20,
+      }}>
+        <div style={{ fontSize: 38, marginBottom: 6 }}>ðŸ‘¶</div>
+        <div style={{ fontWeight: 900, fontSize: 24, letterSpacing: -0.5 }}>Little One Tracker</div>
+        <div style={{ color: "#C8B89A", fontSize: 13, marginTop: 4, marginBottom: 10 }}>Every feed Â· nap Â· smile Â· recorded</div>
+        <SyncBadge status={syncStatus} />
+      </div>
+
+      <div style={{ maxWidth: 520, margin: "0 auto", padding: "0 14px 52px" }}>
+        <StatsBar entries={entries} />
+        <AIInsights entries={entries} />
+        <FeedSection entries={byType("feed")} onAdd={addEntry} onDelete={delEntry} />
+        <NappySection entries={entries.filter((e) => e.type === "poo" || e.type === "wee")} onAdd={addEntry} onDelete={delEntry} />
+        <MoodSection entries={byType("mood")} onAdd={addEntry} onDelete={delEntry} />
+        <ActivitySection entries={byType("activity")} onAdd={addEntry} onDelete={delEntry} />
+        <SleepSection entries={byType("sleep")} onAdd={addEntry} onDelete={delEntry} />
+
+        {entries.length === 0 && syncStatus !== "connecting" && syncStatus !== "syncing" && (
+          <div style={{ textAlign: "center", padding: "32px 20px", color: T.muted }}>
+            <div style={{ fontSize: 44, marginBottom: 12 }}>ðŸŒ±</div>
+            <div style={{ fontWeight: 800, fontSize: 16, color: T.text, marginBottom: 8 }}>Ready when you are</div>
+            <div style={{ fontSize: 14, lineHeight: 1.7 }}>
+              Tap any section above to start logging.<br />
+              Both you and your partner will see entries in real time.
+            </div>
+          </div>
+        )}
+
+        {(syncStatus === "connecting" || (syncStatus === "syncing" && entries.length === 0)) && (
+          <div style={{ textAlign: "center", padding: "32px 20px", color: T.muted }}>
+            <div style={{ fontSize: 36, marginBottom: 10 }}>â˜ï¸</div>
+            <div style={{ fontSize: 14 }}>Connecting to your shared databaseâ€¦</div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
