@@ -418,5 +418,242 @@ function SleepSection({ entries, onAdd, onDelete }) {
     await onAdd({
       id: uid(), type: "sleep",
       timestamp: fromLocal(sleepStart),
-      sleep_start: fromLocal(sleepStart),
-      sleep_end
+sleep_start: fromLocal(sleepStart),
+        sleep_end: fromLocal(sleepEnd),
+        duration_mins: Math.round(dur),
+        quality, notes,
+    });
+    setQuality(""); setNotes("");
+    const n = toLocal(nowISO()); setSleepStart(n); setSleepEnd(n);
+    setSaving(false);
+  };
+ 
+  const dur = calcDur();
+  const durLabel = dur && dur > 0
+    ? `${Math.floor(dur / 60) > 0 ? Math.floor(dur / 60) + "h " : ""}${Math.round(dur % 60)}m`
+    : null;
+ 
+  const summarise = (e) => {
+    const h = Math.floor(e.duration_mins / 60), m = e.duration_mins % 60;
+    const s = e.sleep_start || e.timestamp;
+    const en = e.sleep_end || e.timestamp;
+    return `${fmtTime(s)} → ${fmtTime(en)} · ${h > 0 ? h + "h " : ""}${m}m${e.quality ? ` · ${e.quality}` : ""}`;
+  };
+ 
+  return (
+    <Section title="Sleep" emoji="🌙" color={T.sleep} count={entries.length}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <Field label="Fell asleep">
+          <Inp type="datetime-local" value={sleepStart} onChange={(e) => setSleepStart(e.target.value)} />
+        </Field>
+        <Field label="Woke up">
+          <Inp type="datetime-local" value={sleepEnd} onChange={(e) => setSleepEnd(e.target.value)} />
+        </Field>
+      </div>
+      {durLabel && (
+        <div style={{ background: T.sleep.light, borderRadius: 10, padding: "8px 14px", marginBottom: 12, fontSize: 13, fontWeight: 700, color: T.sleep.dark }}>
+          ⏱ Duration: {durLabel}
+        </div>
+      )}
+      <Field label="Sleep quality">
+        <div style={{ display: "flex", gap: 8 }}>
+          {SLEEP_QUALITY.map((q) => <Pill key={q} label={q} active={quality === q} color={qualityColor[q]} onClick={() => setQuality(q)} />)}
+        </div>
+      </Field>
+      <Field label="Notes">
+        <Txt placeholder="e.g. 'woke twice', 'settled easily with dummy'…" value={notes} onChange={(e) => setNotes(e.target.value)} />
+      </Field>
+      <AddBtn color={T.sleep.base} onClick={add} disabled={saving} />
+      {entries.length > 0 && (
+        <div style={{ marginTop: 16 }}>
+          {entries.slice(0, 10).map((e) => (
+            <EntryCard key={e.id} entry={e} color={T.sleep} onDelete={onDelete} summary={summarise(e)} />
+          ))}
+        </div>
+      )}
+    </Section>
+  );
+}
+ 
+// ─── STATS BAR ────────────────────────────────────────────────────────────────
+function StatsBar({ entries }) {
+  const today = new Date().toDateString();
+  const td = entries.filter((e) => new Date(e.timestamp).toDateString() === today);
+  const feeds = td.filter((e) => e.type === "feed");
+  const poos = td.filter((e) => e.type === "poo");
+  const wees = td.filter((e) => e.type === "wee");
+  const sleeps = td.filter((e) => e.type === "sleep");
+  const totalMins = sleeps.reduce((s, e) => s + (e.duration_mins || 0), 0);
+  const sleepStr = totalMins > 0
+    ? `${Math.floor(totalMins / 60) > 0 ? Math.floor(totalMins / 60) + "h" : ""}${totalMins % 60 > 0 ? (totalMins % 60) + "m" : ""}`
+    : "—";
+ 
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6, marginBottom: 18 }}>
+      {[
+        { emoji: "🍼", val: feeds.length, label: "Feeds", color: T.feed.base },
+        { emoji: "💩", val: poos.length, label: "Poos", color: T.poo.base },
+        { emoji: "💧", val: wees.length, label: "Wees", color: "#6B9EC4" },
+        { emoji: "🌙", val: sleepStr, label: "Sleep", color: T.sleep.base },
+        { emoji: "📝", val: entries.length, label: "All logs", color: T.activity.base },
+      ].map((s) => (
+        <div key={s.label} style={{ background: "#fff", borderRadius: 14, padding: "12px 6px", textAlign: "center", boxShadow: "0 2px 10px #0000000a" }}>
+          <div style={{ fontSize: 18 }}>{s.emoji}</div>
+          <div style={{ fontWeight: 900, fontSize: 17, color: s.color, lineHeight: 1.2 }}>{s.val}</div>
+          <div style={{ fontSize: 10, color: T.muted, marginTop: 2, lineHeight: 1.3 }}>{s.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+ 
+// ─── AI INSIGHTS ──────────────────────────────────────────────────────────────
+function AIInsights({ entries }) {
+  const [insight, setInsight] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [open, setOpen] = useState(false);
+ 
+  const analyse = async () => {
+    if (entries.length < 3) { setError("Log at least 3 entries first for meaningful insights!"); return; }
+    setError(""); setLoading(true); setInsight("");
+ 
+    const lines = entries.map((e) => {
+      if (e.type === "feed")     return `[Feed | ${fmtDate(e.timestamp)} ${fmtTime(e.timestamp)}] ${e.what}${e.size ? ` (${e.size})` : ""}${e.duration_mins ? `, ${e.duration_mins} mins` : ""}${e.notes ? ` — "${e.notes}"` : ""}`;
+      if (e.type === "poo")      return `[Nappy/Poo | ${fmtDate(e.timestamp)} ${fmtTime(e.timestamp)}] ${[e.colour, e.consistency, e.size].filter(Boolean).join(", ")}${e.notes ? ` — "${e.notes}"` : ""}`;
+      if (e.type === "wee")      return `[Nappy/Wee | ${fmtDate(e.timestamp)} ${fmtTime(e.timestamp)}]${e.notes ? ` — "${e.notes}"` : ""}`;
+      if (e.type === "mood")     return `[Mood | ${fmtDate(e.timestamp)}] ${e.period}: ${e.mood}${e.notes ? ` — "${e.notes}"` : ""}`;
+      if (e.type === "activity") return `[Activity | ${fmtDate(e.timestamp)} ${fmtTime(e.timestamp)}] ${e.activity}${e.duration_mins ? ` (${e.duration_mins} mins)` : ""}${e.notes ? ` — "${e.notes}"` : ""}`;
+      if (e.type === "sleep")    return `[Sleep | ${fmtDate(e.sleep_start || e.timestamp)}] ${fmtTime(e.sleep_start || e.timestamp)}–${fmtTime(e.sleep_end || e.timestamp)}, ${e.duration_mins} mins, quality: ${e.quality || "unrecorded"}${e.notes ? ` — "${e.notes}"` : ""}`;
+      return "";
+    }).join("\n");
+ 
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1200,
+          system: `You are a warm, expert baby care assistant helping new parents understand their baby's patterns. You receive structured logs of feeds, nappies, moods, activities, and sleep.
+ 
+Give insights under these bold headings:
+**Feeding Patterns** — preferences, portion observations, timing
+**Sleep Patterns** — duration trends, quality, what helps or hinders
+**Mood & Wellbeing** — when she's happiest, links to feeding and sleep
+**Nappy Health** — any notable patterns, reassure where appropriate
+**Activities** — what she engages well with
+**Top Tips** — 2–3 practical, actionable suggestions
+ 
+Be warm, specific, and concise. Tired new parents are reading this on their phones.`,
+          messages: [{ role: "user", content: `Baby's logs:\n\n${lines}\n\nWhat patterns do you see?` }],
+        }),
+      });
+      const data = await res.json();
+      setInsight(data.content?.map((b) => b.text || "").join("") || "No response received.");
+    } catch {
+      setError("Couldn't reach the AI. Please check your connection and try again.");
+    }
+    setLoading(false);
+  };
+ 
+  const renderMd = (text) =>
+    text.split("\n").map((line, i) => {
+      if (/^\*\*(.+)\*\*$/.test(line)) return <div key={i} style={{ fontWeight: 800, color: T.ai.dark, marginTop: 14, marginBottom: 4, fontSize: 14 }}>{line.replace(/\*\*/g, "")}</div>;
+      if (line.startsWith("- ") || line.startsWith("• ")) return <div key={i} style={{ fontSize: 14, color: T.text, paddingLeft: 14, marginBottom: 4, lineHeight: 1.6 }}>• {line.slice(2)}</div>;
+      return line ? <div key={i} style={{ fontSize: 14, color: T.text, marginBottom: 4, lineHeight: 1.65 }}>{line}</div> : <div key={i} style={{ height: 6 }} />;
+    });
+ 
+  return (
+    <div style={{ marginBottom: 14, borderRadius: 18, overflow: "hidden", boxShadow: "0 2px 16px #00000009", border: `2px solid ${T.ai.base}33` }}>
+      <div onClick={() => setOpen((o) => !o)} style={{
+        background: T.ai.light, padding: "16px 18px",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        cursor: "pointer", userSelect: "none",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 24 }}>✨</span>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: 16, color: T.ai.dark }}>AI Pattern Insights</div>
+            <div style={{ fontSize: 12, color: T.muted }}>Spot patterns across all your logs</div>
+          </div>
+        </div>
+        <span style={{ color: T.ai.base, fontSize: 22, fontWeight: 700, lineHeight: 1 }}>{open ? "−" : "+"}</span>
+      </div>
+      {open && (
+        <div style={{ background: "#fff", padding: 18 }}>
+          {error && <div style={{ color: T.feed.base, fontSize: 13, marginBottom: 10, fontWeight: 600 }}>{error}</div>}
+          {insight && (
+            <div style={{ background: T.ai.light, borderRadius: 14, padding: "14px 16px", marginBottom: 14, border: `1px solid ${T.ai.base}22` }}>
+              {renderMd(insight)}
+            </div>
+          )}
+          <button onClick={analyse} disabled={loading} style={{
+            width: "100%", padding: 13, borderRadius: 12, border: "none",
+            background: loading ? "#ccc" : `linear-gradient(135deg, ${T.ai.base}, #7C3AED)`,
+            color: "#fff", fontWeight: 800, fontSize: 15,
+            cursor: loading ? "not-allowed" : "pointer",
+            boxShadow: loading ? "none" : `0 4px 16px ${T.ai.base}44`,
+            fontFamily: "inherit",
+          }}>
+            {loading ? "Analysing all logs… 🔍" : "Analyse Patterns ✨"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+ 
+// ─── SYNC STATUS ──────────────────────────────────────────────────────────────
+function SyncBadge({ status }) {
+  const cfg = {
+    connected: { color: "#4A9E8B", label: "● Synced" },
+    syncing:   { color: "#E8A838", label: "↻ Syncing…" },
+    error:     { color: "#E8734A", label: "⚠ Offline" },
+  }[status] || { color: T.muted, label: "Connecting…" };
+ 
+  return (
+    <span style={{ fontSize: 11, fontWeight: 700, color: cfg.color, background: cfg.color + "18", borderRadius: 20, padding: "3px 10px" }}>
+      {cfg.label}
+    </span>
+  );
+}
+ 
+// ─── ROOT APP ─────────────────────────────────────────────────────────────────
+export default function App() {
+  const [entries, setEntries] = useState([]);
+  const [syncStatus, setSyncStatus] = useState("connecting");
+ 
+  const loadEntries = useCallback(async () => {
+    setSyncStatus("syncing");
+    const { data, error } = await supabase
+      .from("entries")
+      .select("*")
+      .order("timestamp", { ascending: false })
+      .limit(500);
+ 
+    if (error) {
+      console.error("Load error:", error);
+      setSyncStatus("error");
+    } else {
+      setEntries(data || []);
+      setSyncStatus("connected");
+    }
+  }, []);
+ 
+  useEffect(() => {
+    loadEntries();
+ 
+    const channel = supabase
+      .channel("entries-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "entries" }, () => {
+        loadEntries();
+      })
+      .subscribe();
+ 
+    return () => supabase.removeChannel(channel);
+  }, [loadEntries]);
+ 
+  const addEntry = async (entry) => {
+    setSyncStatus("syncing");
+    const { error } = await supabase.f
